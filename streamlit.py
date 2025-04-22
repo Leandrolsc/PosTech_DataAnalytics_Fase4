@@ -8,7 +8,6 @@ st.title("Visualização e Download de Dados")
 csv_file = "tabela_extraida.csv"
 
 
-
 try:
     df = pd.read_csv(csv_file)
     
@@ -19,6 +18,18 @@ try:
         # Remover linhas com valores inválidos
         df = df.dropna(subset=["Data", "Preço - petróleo bruto - Brent (FOB)"])
         
+        datamaxima = df["Data"].max()
+        dataminima = df["Data"].min()
+
+        st.markdown(f"""Data de: **{dataminima.strftime('%d/%m/%Y')}** ate **{datamaxima.strftime('%d/%m/%Y')}**  
+                    Total de registros: **{len(df)}**  
+                    Dados extraidos do IPEA - Instituto de Pesquisa Econômica Aplicada  
+                    Fonte: http://www.ipeadata.gov.br/ExibeSerie.aspx?module=m&serid=1650971490&oper=view  
+                    """)
+
+        st.write("------")
+
+
         # Converter a coluna de preços para float
         df["Preço - petróleo bruto - Brent (FOB)"] = df["Preço - petróleo bruto - Brent (FOB)"].str.replace(",", ".").astype(float)
         
@@ -33,11 +44,15 @@ try:
         st.plotly_chart(fig)
     else:
         st.error("O arquivo CSV não contém as colunas necessárias: 'Data' e 'Preço - petróleo bruto - Brent (FOB)'.")
+    
+    st.write("------") 
 
     st.subheader("Dados do CSV")
+    st.write("")
     st.dataframe(df)
 
     st.subheader("Baixar Dados")
+    st.write("")
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button(
         label="Baixar tabela_extraida.csv",
@@ -50,9 +65,16 @@ except FileNotFoundError:
     st.error(f"O arquivo '{csv_file}' não foi encontrado.")
 except Exception as e:
     st.error(f"Ocorreu um erro: {e}")
-
+st.write("------") 
 
 # Botão para executar o script scrapping.py
+st.subheader("Atualizar Tabela")
+st.markdown("""Clique no botão abaixo para atualizar a tabela caso esteja desatualizada.  
+            Antes de clicar cheque antes na fonte se a tabela está atualizada.
+            """) 
+
+st.write("")
+
 if st.button("Atualizar Tabela caso esteja desatualizada"):
     try:
         # Executar o script scrapping.py
