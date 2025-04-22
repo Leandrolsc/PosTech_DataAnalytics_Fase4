@@ -7,21 +7,7 @@ st.title("Visualização e Download de Dados")
 
 csv_file = "tabela_extraida.csv"
 
-# Botão para executar o script scrapping.py
-if st.button("Atualizar Tabela"):
-    try:
-        # Executar o script scrapping.py
-        data_fetcher = GetIpeaDataPetroleo()
-        df = data_fetcher.fetch_data()
-        
-        if df is not None:
-            # Salvar o DataFrame em um arquivo CSV
-            data_fetcher.save_to_csv(df)
-            st.success(f"Tabela atualizada e salva como '{csv_file}'.")
-        else:
-            st.error("Erro ao atualizar a tabela.")
-    except Exception as e:
-        st.error(f"Ocorreu um erro ao executar o script: {e}")
+
 
 try:
     df = pd.read_csv(csv_file)
@@ -64,3 +50,20 @@ except FileNotFoundError:
     st.error(f"O arquivo '{csv_file}' não foi encontrado.")
 except Exception as e:
     st.error(f"Ocorreu um erro: {e}")
+
+
+# Botão para executar o script scrapping.py
+if st.button("Atualizar Tabela caso esteja desatualizada"):
+    try:
+        # Executar o script scrapping.py
+        data_fetcher = GetIpeaDataPetroleo()
+        df = data_fetcher.fetch_data()
+        
+        if df is not None:
+            # Salvar o DataFrame em um arquivo CSV
+            data_fetcher.save_to_csv(df)
+            st.success(f"Tabela atualizada e salva como '{csv_file}'.")
+        else:
+            st.error("Erro ao atualizar a tabela.")
+    except Exception as e:
+        st.error(f"Ocorreu um erro ao executar o script: {e}")
