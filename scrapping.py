@@ -1,11 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import json
+from datetime import datetime
 
 class GetIpeaDataPetroleo:
     def __init__(self):
         self.url = "http://www.ipeadata.gov.br/ExibeSerie.aspx?module=m&serid=1650971490&oper=view"
         self.csv_file = "tabela_extraida.csv"
+        self.metadata_file = "metadata.json"
 
     def fetch_data(self):
         try:
@@ -52,5 +55,25 @@ class GetIpeaDataPetroleo:
             # Salvar o DataFrame em um arquivo CSV
             df.to_csv(self.csv_file, index=False, encoding="utf-8-sig")
             print(f"Tabela salva com sucesso no arquivo '{self.csv_file}'.")
+
+            # Carregar metadados existentes, se o arquivo JSON já existir
+            try:
+                with open(self.metadata_file, "r", encoding="utf-8") as json_file:
+                    metadata_list = json.load(json_file)
+            except FileNotFoundError:
+                metadata_list = []  # Criar uma lista vazia se o arquivo não existir
+
+            # Adicionar novos metadados
+            new_metadata = {
+                "data_extracao": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "quantidade_linhas": len(df)
+            }
+            metadata_list.append(new_metadata)
+
+            # Salvar os metadados atualizados no arquivo JSON
+            with open(self.metadata_file, "w", encoding="utf-8") as json_file:
+                json.dump(metadata_list, json_file, ensure_ascii=False, indent=4)
+            print(f"Metadados atualizados e salvos com sucesso no arquivo '{self.metadata_file}'.")
+
         except Exception as e:
-            print(f"Erro ao salvar o arquivo CSV: {e}")
+            print(f"Erro ao salvar o arquivo CSV ou metadados: {e}")

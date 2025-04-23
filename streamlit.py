@@ -2,6 +2,30 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from scrapping import GetIpeaDataPetroleo
+import json
+import os
+
+st.set_page_config(
+    page_title="Análise do Preço do Petróleo Brent",
+    page_icon=":oil_drum:",
+    layout="centered",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Report a bug': "https://github.com/seu-usuario/PosTech_FIAP_F4/issues",
+        'About': """
+        ## Sobre o Projeto
+        Esta aplicação foi desenvolvida como parte do trabalho da Fase 4 da Pós Tech em Data Analytics na FIAP.  
+        O objetivo é realizar uma análise do preço do petróleo Brent, utilizando dados históricos extraídos do IPEA.  
+        """
+    }
+)
+
+st.title("Análise do Preço do Petróleo Brent")
+st.markdown("""
+* Este projeto faz parte do trabalho da Fase 4 da Pós Tech em Data Analytics na FIAP.  
+* O objetivo é realizar uma análise do preço do petróleo Brent, utilizando dados históricos extraídos do IPEA (Instituto de Pesquisa Econômica Aplicada).  
+* A aplicação permite visualizar os dados, gerar gráficos temporais e realizar o download das informações em formato CSV. --Até o momento...
+""")
 
 # Criar as abas
 tab1, tab2, tab3 = st.tabs(["Storytelling e download dos dados", "Machine Learning", "Estrutura do projeto"])
@@ -11,6 +35,17 @@ with tab1:
     st.title("Storytelling e download dos dados")
 
     csv_file = "tabela_extraida.csv"
+    metadata_file = "metadata.json"
+    
+    ultima_data_extracao = "Não disponível"
+    if os.path.exists(metadata_file):
+        try:
+            with open(metadata_file, "r", encoding="utf-8") as json_file:
+                metadata_list = json.load(json_file)
+                if metadata_list:
+                    ultima_data_extracao = metadata_list[-1]["data_extracao"]
+        except Exception as e:
+            st.error(f"Erro ao carregar o arquivo de metadados: {e}")
 
     try:
         df = pd.read_csv(csv_file)
@@ -29,6 +64,7 @@ with tab1:
                         Total de registros: **{len(df)}**  
                         Dados extraidos do IPEA - Instituto de Pesquisa Econômica Aplicada  
                         Fonte: http://www.ipeadata.gov.br/ExibeSerie.aspx?module=m&serid=1650971490&oper=view  
+                        Dados extraidos em: **{ultima_data_extracao}**
                         """)
 
             st.write("------")
@@ -72,9 +108,12 @@ with tab1:
 
     # Botão para executar o script scrapping.py
     st.subheader("Atualizar Tabela")
-    st.markdown("""Clique no botão abaixo para atualizar a tabela caso esteja desatualizada.  
-                Antes de clicar cheque antes na fonte se a tabela está atualizada.
-                """) 
+    st.markdown(f"""
+                Clique no botão abaixo para atualizar a tabela, caso esteja desatualizada.  
+                **Antes de prosseguir, verifique a data da última extração exibida acima e confirme se há novos dados disponíveis na fonte oficial.**  
+                Data da Ultima extração: **{ultima_data_extracao}**
+                
+                """)
 
     st.write("")
 
@@ -88,6 +127,7 @@ with tab1:
                 # Salvar o DataFrame em um arquivo CSV
                 data_fetcher.save_to_csv(df)
                 st.success(f"Tabela atualizada e salva como '{csv_file}'.")
+                st.rerun()  # Recarregar a página para mostrar os dados atualizados
             else:
                 st.error("Erro ao atualizar a tabela.")
         except Exception as e:
