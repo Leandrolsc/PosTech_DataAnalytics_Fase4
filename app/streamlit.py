@@ -138,23 +138,23 @@ with tab1:
 with tab2:
     st.title("Machine Learning")
     # Treinar o modelo e obter previsões
-    st.write("Treinando o modelo e gerando previsões...")
     df_brent_forecast_25 = train_and_forecast()
 
     # Avaliar o modelo
-    st.write("Avaliando o modelo...")
     mae, rmse, wmape = evaluate_model(df_brent_forecast_25)
     #st.write(f"**MAE:** {mae:.4f}")
     #st.write(f"**RMSE:** {rmse:.4f}")
     st.write(f"**WMAPE:** {wmape:.4%}")
+
+    st.write("**Gráfico de Previsões:**")
+    st.pyplot(plot_results(df_brent_forecast_25))
 
     # Exibir os resultados
     st.write("**Resultados das previsões:**")
     st.dataframe(df_brent_forecast_25)
 
     # Plotar os resultados
-    st.write("**Gráfico de Previsões:**")
-    st.pyplot(plot_results(df_brent_forecast_25))
+   
 
 
     ##Projetar 7/15/30/60/90 dias para frente
