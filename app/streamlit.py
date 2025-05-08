@@ -144,8 +144,8 @@ with tab2:
     # Avaliar o modelo
     st.write("Avaliando o modelo...")
     mae, rmse, wmape = evaluate_model(df_brent_forecast_25)
-    st.write(f"**MAE:** {mae:.4f}")
-    st.write(f"**RMSE:** {rmse:.4f}")
+    #st.write(f"**MAE:** {mae:.4f}")
+    #st.write(f"**RMSE:** {rmse:.4f}")
     st.write(f"**WMAPE:** {wmape:.4%}")
 
     # Exibir os resultados

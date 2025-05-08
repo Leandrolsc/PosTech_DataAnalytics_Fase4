@@ -19,7 +19,7 @@ def train_and_forecast():
     df_brent_prophet.columns = ['ds', 'y']
 
     # Treinar o modelo Prophet otimizado
-    year = 2000  # Ano inicial para treinamento
+    year = 2022  # Ano inicial para treinamento
     df_brent_prophet['year'] = df_brent_prophet['ds'].dt.year
 
     df_prophet_model = Prophet(
