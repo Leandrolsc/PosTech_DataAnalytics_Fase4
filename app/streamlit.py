@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from scrapping import GetIpeaDataPetroleo
+from model import train_and_forecast, evaluate_model,plot_results
 import json
 import os
 
@@ -11,7 +12,7 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="expanded",
     menu_items={
-        'Report a bug': "https://github.com/seu-usuario/PosTech_FIAP_F4/issues",
+        'Report a bug': "https://github.com/Leandrolsc/PosTech_DataAnalytics_Fase4/issues",
         'About': """
         ## Sobre o Projeto
         Esta aplicação foi desenvolvida como parte do trabalho da Fase 4 da Pós Tech em Data Analytics na FIAP.  
@@ -34,8 +35,8 @@ tab1, tab2, tab3 = st.tabs(["Storytelling e download dos dados", "Machine Learni
 with tab1:
     st.title("Storytelling e download dos dados")
 
-    csv_file = "tabela_extraida.csv"
-    metadata_file = "metadata.json"
+    csv_file = "data/tabela_extraida.csv"
+    metadata_file = "data/metadata.json"
     
     ultima_data_extracao = "Não disponível"
     if os.path.exists(metadata_file):
@@ -136,7 +137,28 @@ with tab1:
 # Aba 2: Machine Learning (vazia)
 with tab2:
     st.title("Machine Learning")
-    st.write("Conteúdo em desenvolvimento.")
+    # Treinar o modelo e obter previsões
+    st.write("Treinando o modelo e gerando previsões...")
+    df_brent_forecast_25 = train_and_forecast()
+
+    # Avaliar o modelo
+    st.write("Avaliando o modelo...")
+    mae, rmse, wmape = evaluate_model(df_brent_forecast_25)
+    st.write(f"**MAE:** {mae:.4f}")
+    st.write(f"**RMSE:** {rmse:.4f}")
+    st.write(f"**WMAPE:** {wmape:.4%}")
+
+    # Exibir os resultados
+    st.write("**Resultados das previsões:**")
+    st.dataframe(df_brent_forecast_25)
+
+    # Plotar os resultados
+    st.write("**Gráfico de Previsões:**")
+    st.pyplot(plot_results(df_brent_forecast_25))
+
+
+    ##Projetar 7/15/30/60/90 dias para frente
+    ##Utilizar todo historico ou apenas 2022/2023/2024...
 
 # Aba 3: Estrutura do Projeto (vazia)
 with tab3:
