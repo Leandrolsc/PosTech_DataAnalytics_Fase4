@@ -9,51 +9,52 @@ def train_and_forecast():
     df_brent = pd.read_csv('data/tabela_extraida.csv', sep=',')
     df_brent.columns = ['Data', 'Preço Brent FOB (US$/barril)']
 
-    # Limpar e ajustar os dados
+    # Converter a coluna de data
     df_brent['Data'] = pd.to_datetime(df_brent['Data'], format='%d/%m/%Y')
-    df_brent['Preço Brent FOB (US$/barril)_Corrigido'] = df_brent['Preço Brent FOB (US$/barril)'].str.replace(',', '.').astype(float)
+
+    # Corrigir valores de preço (vírgula para ponto) e converter para float
+    df_brent['Preço Brent FOB (US$/barril)'] = df_brent['Preço Brent FOB (US$/barril)'].astype(str)
+    df_brent['Preço Brent FOB (US$/barril)_Corrigido'] = df_brent['Preço Brent FOB (US$/barril)'].str.replace(',', '.', regex=False).astype(float)
+
+    # Remover a coluna original
     df_brent.drop(columns=['Preço Brent FOB (US$/barril)'], inplace=True)
 
-    # Ajustar os dados para o Prophet
-    df_brent_prophet = df_brent[['Data', 'Preço Brent FOB (US$/barril)_Corrigido']].copy()
-    df_brent_prophet.columns = ['ds', 'y']
+    # Preparar dados para o Prophet
+    df_prophet = df_brent[['Data', 'Preço Brent FOB (US$/barril)_Corrigido']].copy()
+    df_prophet.columns = ['ds', 'y']
+    df_prophet['year'] = df_prophet['ds'].dt.year
 
-    # Treinar o modelo Prophet otimizado
-    year = 2022  # Ano inicial para treinamento
-    df_brent_prophet['year'] = df_brent_prophet['ds'].dt.year
-
-    df_prophet_model = Prophet(
+    # Treinar o modelo Prophet
+    model = Prophet(
         changepoint_prior_scale=0.5,
         seasonality_prior_scale=0.01,
         n_changepoints=50
     )
-    df_prophet_model.fit(df_brent_prophet.query(f'year >= {year} and year < 2025'))
+    model.fit(df_prophet.query('year >= 2022 and year < 2025'))
 
     # Criar previsões para os próximos 90 dias
-    df_brent_forecast = df_prophet_model.predict(df_prophet_model.make_future_dataframe(periods=90))
-    df_brent_forecast = df_brent_forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
-    df_brent_forecast['year'] = df_brent_forecast['ds'].dt.year
+    future = model.make_future_dataframe(periods=90)
+    forecast = model.predict(future)
+    forecast = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+    forecast['year'] = forecast['ds'].dt.year
 
     # Filtrar previsões para 2025
-    df_brent_forecast_25 = df_brent_forecast.query('year >= 2025').drop(columns=['yhat_lower', 'yhat_upper'])
+    forecast_2025 = forecast.query('year >= 2025').drop(columns=['yhat_lower', 'yhat_upper'])
 
-    # Combinar os dados reais com as previsões
-    df_brent_forecast_25 = df_brent.merge(
-        df_brent_forecast_25,
+    # Combinar previsões com dados reais (se houver)
+    df_merged = df_brent.merge(
+        forecast_2025,
         left_on='Data',
         right_on='ds',
         how='inner'
-    )
+    ).drop(columns=['ds'])
 
-    # Remover as colunas que não são mais necessárias
-    df_brent_forecast_25.drop(columns=['ds'], inplace=True)
+    return df_merged
 
-    return df_brent_forecast_25
-
-def evaluate_model(df_brent_forecast_25):
+def evaluate_model(df_merged):
     # Avaliar o modelo
-    y_true = df_brent_forecast_25["Preço Brent FOB (US$/barril)_Corrigido"]
-    y_pred = df_brent_forecast_25["yhat"]
+    y_true = df_merged["Preço Brent FOB (US$/barril)_Corrigido"]
+    y_pred = df_merged["yhat"]
 
     mae = mean_absolute_error(y_true, y_pred)
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
@@ -61,21 +62,42 @@ def evaluate_model(df_brent_forecast_25):
 
     return mae, rmse, wmape
 
-def plot_results(df_brent_forecast_25):
-    # Plotar os resultados
-    df_brent_forecast_25.sort_values('Data', inplace=True)
+def previsao(dias=30):
+    # Carregar os dados
+    df_brent = pd.read_csv('data/tabela_extraida.csv', sep=',')
+    df_brent.columns = ['Data', 'Preço Brent FOB (US$/barril)']
 
-    plt.figure(figsize=(12, 6))
-    plt.plot(df_brent_forecast_25['Data'], 
-             df_brent_forecast_25["Preço Brent FOB (US$/barril)_Corrigido"], 
-             label='Preço Real', color='blue')
-    plt.plot(df_brent_forecast_25['Data'], 
-             df_brent_forecast_25['yhat'], 
-             label='Previsão (yhat)', color='red', linestyle='--')
+    # Converter datas e preços
+    df_brent['Data'] = pd.to_datetime(df_brent['Data'], format='%d/%m/%Y')
+    df_brent['Preço Brent FOB (US$/barril)'] = df_brent['Preço Brent FOB (US$/barril)'].astype(str)
+    df_brent['Preço Brent FOB (US$/barril)_Corrigido'] = (
+        df_brent['Preço Brent FOB (US$/barril)']
+        .str.replace(',', '.', regex=False)
+        .astype(float)
+    )
+    df_brent.drop(columns=['Preço Brent FOB (US$/barril)'], inplace=True)
 
-    plt.xlabel('Data')
-    plt.ylabel('Preço (US$/barril)')
-    plt.title('Comparação entre Preço Real e Previsão do Modelo')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    # Preparar dados para o Prophet
+    df_prophet = df_brent[['Data', 'Preço Brent FOB (US$/barril)_Corrigido']].copy()
+    df_prophet.columns = ['ds', 'y']
+
+    #Filtro 2022 em diante
+    df_prophet_filtrado = df_prophet[df_prophet['ds'].dt.year >= 2022] #Filtrei aqui por conta do tempo de processamento e dos outliers do dataframe original.
+    # Treinar o modelo Prophet
+    model = Prophet(
+        changepoint_prior_scale=0.5,
+        seasonality_prior_scale=0.01,
+        n_changepoints=50
+    )
+    model.fit(df_prophet_filtrado)
+
+    # Gerar previsões a partir da última data do histórico
+    last_date = df_prophet['ds'].max()
+    forecast_periods = dias  # dias futuros
+    future = model.make_future_dataframe(periods=forecast_periods)
+    future = future[future['ds'] > last_date]  # manter apenas datas futuras
+
+    forecast = model.predict(future)
+    forecast = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+
+    return forecast

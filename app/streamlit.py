@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from scrapping import GetIpeaDataPetroleo
-from model import train_and_forecast, evaluate_model,plot_results
+from model import train_and_forecast, evaluate_model, previsao
 import json
 import os
 
@@ -139,24 +139,24 @@ with tab2:
     st.title("Machine Learning")
     # Treinar o modelo e obter previsões
     df_brent_forecast_25 = train_and_forecast()
-
-    # Avaliar o modelo
     mae, rmse, wmape = evaluate_model(df_brent_forecast_25)
-    #st.write(f"**MAE:** {mae:.4f}")
-    #st.write(f"**RMSE:** {rmse:.4f}")
     st.write(f"**WMAPE:** {wmape:.4%}")
 
-    st.write("**Gráfico de Previsões:**")
-    st.pyplot(plot_results(df_brent_forecast_25))
+
+    st.write("Escolha o período para previsão:")
+    periods = st.selectbox(
+        "Selecione o número de dias para previsão:",
+        options=[7, 15, 30, 45, 60, 90],
+        index=0
+    )
 
     # Exibir os resultados
     st.write("**Resultados das previsões:**")
-    st.dataframe(df_brent_forecast_25)
+    st.dataframe(previsao(periods))
 
-    # Plotar os resultados
    
 
-
+    ##Criar logo FP Petroleo
     ##Projetar 7/15/30/60/90 dias para frente
     ##Utilizar todo historico ou apenas 2022/2023/2024...
 
