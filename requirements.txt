@@ -5,3 +5,4 @@ plotly
 prophet
 matplotlib
 scikit-learn
+streamlit_option_menu 
