@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def train_and_forecast():
     # Carregar os dados do Brent a partir do arquivo CSV
-    df_brent = pd.read_csv('data/tabela_extraida.csv', sep=',')
+    df_brent = pd.read_csv('app/data/tabela_extraida.csv', sep=',')
     df_brent.columns = ['Data', 'Preço Brent FOB (US$/barril)']
 
     # Converter a coluna de data
@@ -64,7 +64,7 @@ def evaluate_model(df_merged):
 
 def previsao(dias=30):
     # Carregar os dados
-    df_brent = pd.read_csv('data/tabela_extraida.csv', sep=',')
+    df_brent = pd.read_csv('app/data/tabela_extraida.csv', sep=',')
     df_brent.columns = ['Data', 'Preço Brent FOB (US$/barril)']
 
     # Converter datas e preços

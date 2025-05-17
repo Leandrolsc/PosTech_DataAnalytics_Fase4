@@ -7,8 +7,8 @@ from datetime import datetime
 class GetIpeaDataPetroleo:
     def __init__(self):
         self.url = "http://www.ipeadata.gov.br/ExibeSerie.aspx?module=m&serid=1650971490&oper=view"
-        self.csv_file = "data/tabela_extraida.csv"
-        self.metadata_file = "data/metadata.json"
+        self.csv_file = "app/data/tabela_extraida.csv"
+        self.metadata_file = "app/data/metadata.json"
 
     def fetch_data(self):
         try:

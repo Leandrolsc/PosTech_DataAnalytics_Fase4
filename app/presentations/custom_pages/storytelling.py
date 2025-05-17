@@ -7,14 +7,14 @@ import json
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from scrapping import GetIpeaDataPetroleo
+from use_cases.scrapping import GetIpeaDataPetroleo
 
 def exibir():
 
     st.title("Storytelling e download dos dados")
 
-    csv_file = "data/tabela_extraida.csv"
-    metadata_file = "data/metadata.json"
+    csv_file = "app/data/tabela_extraida.csv"
+    metadata_file = "app/data/metadata.json"
 
     ultima_data_extracao = "Não disponível"
     if os.path.exists(metadata_file):

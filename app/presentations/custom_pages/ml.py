@@ -8,8 +8,8 @@ import altair as alt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-from scrapping import GetIpeaDataPetroleo
-from model import train_and_forecast, evaluate_model, previsao
+from use_cases.scrapping import GetIpeaDataPetroleo
+from use_cases.model import train_and_forecast, evaluate_model, previsao
 
 def exibir():
     st.title("Machine Learning")
