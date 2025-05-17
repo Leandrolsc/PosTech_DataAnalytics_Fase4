@@ -7,97 +7,41 @@ import json
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from use_cases.scrapping import GetIpeaDataPetroleo
-
 def exibir():
 
-    st.title("Storytelling e download dos dados")
+    st.title("Entenda o Preço do Petróleo")
+    st.markdown("""
+O petróleo é uma das commodities mais sensíveis às crises globais, sendo diretamente afetado por conflitos geopolíticos, recessões econômicas e pandemias. Ao longo da história, diversas crises moldaram o mercado petrolífero, provocando oscilações drásticas nos preços e afetando economias ao redor do mundo.
 
-    csv_file = "app/data/tabela_extraida.csv"
-    metadata_file = "app/data/metadata.json"
+### Guerra do Golfo (1990-1991)
+A Guerra do Golfo foi desencadeada pela invasão do Kuwait pelo Iraque, levando a uma intervenção militar liderada pelos Estados Unidos. O conflito gerou preocupações sobre o fornecimento de petróleo do Oriente Médio, uma região responsável por grande parte da produção global. Como resultado, os preços do petróleo dispararam, atingindo cerca de US\$ 41 por barril em 1990, após o fim do conflito.
 
-    ultima_data_extracao = "Não disponível"
-    if os.path.exists(metadata_file):
-        try:
-            with open(metadata_file, "r", encoding="utf-8") as json_file:
-                metadata_list = json.load(json_file)
-                if metadata_list:
-                    ultima_data_extracao = metadata_list[-1]["data_extracao"]
-        except Exception as e:
-            st.error(f"Erro ao carregar o arquivo de metadados: {e}")
-    try:
-        df = pd.read_csv(csv_file)
-        
-        if "Data" in df.columns and "Preço - petróleo bruto - Brent (FOB)" in df.columns:
-            # Converter a coluna "Data" para o formato datetime
-            df["Data"] = pd.to_datetime(df["Data"], format="%d/%m/%Y", errors="coerce")
-            
-            # Remover linhas com valores inválidos
-            df = df.dropna(subset=["Data", "Preço - petróleo bruto - Brent (FOB)"])
-            
-            datamaxima = df["Data"].max()
-            dataminima = df["Data"].min()
-            st.markdown(f"""Data de: **{dataminima.strftime('%d/%m/%Y')}** ate **{datamaxima.strftime('%d/%m/%Y')}**  
-                        Total de registros: **{len(df)}**  
-                        Dados extraidos do IPEA - Instituto de Pesquisa Econômica Aplicada  
-                        Fonte: http://www.ipeadata.gov.br/ExibeSerie.aspx?module=m&serid=1650971490&oper=view  
-                        Dados extraidos em: **{ultima_data_extracao}**
-                        """)
-            st.write("------")
-            # Converter a coluna de preços para float
-            df["Preço - petróleo bruto - Brent (FOB)"] = df["Preço - petróleo bruto - Brent (FOB)"].str.replace(",", ".").astype(float)
-            
-            st.subheader("Gráfico Temporal")
-            fig = px.line(
-                df,
-                x="Data",
-                y="Preço - petróleo bruto - Brent (FOB)",
-                title="Evolução do Preço do Petróleo Brent",
-                labels={"Data": "Data", "Preço - petróleo bruto - Brent (FOB)": "Preço"},
-            )
-            st.plotly_chart(fig)
-        else:
-            st.error("O arquivo CSV não contém as colunas necessárias: 'Data' e 'Preço - petróleo bruto - Brent (FOB)'.")
-        
-        st.write("------") 
-        st.subheader("Dados do CSV")
-        st.write("")
-        st.dataframe(df)
-        st.subheader("Baixar Dados")
-        st.write("")
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Baixar tabela_extraida.csv",
-            data=csv,
-            file_name="tabela_extraida.csv",
-            mime="text/csv",
-        )
-    except FileNotFoundError:
-        st.error(f"O arquivo '{csv_file}' não foi encontrado.")
-    except Exception as e:
-        st.error(f"Ocorreu um erro: {e}")
-    st.write("------") 
-    # Botão para executar o script scrapping.py
-    st.subheader("Atualizar Tabela")
-    st.markdown(f"""
-                Clique no botão abaixo para atualizar a tabela, caso esteja desatualizada.  
-                **Antes de prosseguir, verifique a data da última extração exibida acima e confirme se há novos dados disponíveis na fonte oficial.**  
-                Data da Ultima extração: **{ultima_data_extracao}**
+### Crise dos Tigres Asiáticos (1997)
+A crise financeira asiática de 1997 teve origem na Tailândia e rapidamente se espalhou para outros países do Sudeste Asiático. A recessão econômica resultante reduziu a demanda por petróleo, levando a uma queda nos preços. Durante a crise, o preço do barril caiu de US\$ 23 para cerca de US\$ 12, refletindo a menor demanda global.
+
+### Crise Financeira de 2008
+A crise financeira global de 2008, causada pelo colapso do mercado imobiliário dos Estados Unidos, teve um impacto significativo no setor de petróleo. Inicialmente, os preços do petróleo atingiram um pico histórico de quase US\$ 147 por barril em julho de 2008, mas, com o agravamento da recessão, a demanda despencou, levando a uma queda abrupta para cerca de US\$ 33 por barril em fevereiro de 2009.
+
+### Pandemia de COVID-19 (2020-2021)
+A pandemia de COVID-19 provocou uma das maiores quedas na demanda por petróleo da história. Com lockdowns ao redor do mundo e a redução drástica do transporte e da atividade industrial, os preços do petróleo chegaram a ficar negativos em abril de 2020, um evento sem precedentes. Em 2021, com a recuperação econômica, o barril voltou a subir, atingindo US\$ 80 no final do ano.
+
+### Guerra na Ucrânia (2022)
+A invasão da Ucrânia pela Rússia em 2022 gerou uma nova onda de instabilidade no mercado de petróleo. A Rússia, um dos maiores produtores mundiais, enfrentou sanções econômicas que afetaram suas exportações, levando os preços do petróleo a atingirem US\$ 120 por barril em março de 2022.
+
                 
-                """)
-    st.write("")
-    if st.button("Atualizar Tabela caso esteja desatualizada"):
-        try:
-            # Executar o script scrapping.py
-            data_fetcher = GetIpeaDataPetroleo()
-            df = data_fetcher.fetch_data()
-            
-            if df is not None:
-                # Salvar o DataFrame em um arquivo CSV
-                data_fetcher.save_to_csv(df)
-                st.success(f"Tabela atualizada e salva como '{csv_file}'.")
-                st.rerun()  # Recarregar a página para mostrar os dados atualizados
-            else:
-                st.error("Erro ao atualizar a tabela.")
-        except Exception as e:
-            st.error(f"Ocorreu um erro ao executar o script: {e}")
+O gráfico abaixo ilustra a evolução do preço do petróleo Brent ao longo das últimas décadas, destacando os principais eventos que impactaram o mercado.
+""")
+    st.image("app/data/images/grafico_explicativo.jpg", caption="Evolução do Preço do Petróleo Brent (1987-2025)")
+    st.markdown("""
+
+---
+
+#### Referências
+
+- FORBES. Cinco crises que moldaram o mercado de petróleo e o impacto na Petrobras. 2024. Disponível em: <https://forbes.com.br/forbes-money/2024/10/cinco-crises-que-moldaram-o-mercado-de-petroleo-e-o-impacto-na-petrobras/>. Acesso em: 17 maio 2025.  
+- CNN BRASIL. Preço do petróleo bate maior nível desde 2008 com atrasos em negociações no Irã. 2022. Disponível em: <https://www.cnnbrasil.com.br/economia/macroeconomia/preco-do-petroleo-bate-maior-nivel-desde-2008-com-atrasos-em-negociacoes-no-ira/>. Acesso em: 17 maio 2025.  
+- CNN BRASIL. Há um ano, preço do petróleo estava negativo, mas isso agora é passado. 2021. Disponível em: <https://www.cnnbrasil.com.br/economia/macroeconomia/ha-um-ano-preco-do-petroleo-estava-negativo-mas-isso-agora-e-passado/>. Acesso em: 17 maio 2025.  
+- BBC NEWS BRASIL. Alta e queda do petróleo de 2008 a 2009. 2008. Disponível em: <https://www.bbc.com/portuguese/reporterbbc/story/2008/12/081217_petroleo_qandarg>. Acesso em: 17 maio 2025.  
+- BRASIL ESCOLA. Guerra do Golfo: causas, desdobramentos e consequências. 2025. Disponível em: <https://brasilescola.uol.com.br/historiag/guerra-golfo.htm>. Acesso em: 17 maio 2025.  
+- SUNO RESEARCH. Crise asiática: causas, impactos e desdobramentos. 2025. Disponível em: <https://www.suno.com.br/artigos/crise-asiatica/>. Acesso em: 17 maio 2025.  
+    """)

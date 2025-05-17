@@ -8,7 +8,6 @@ import altair as alt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-from use_cases.scrapping import GetIpeaDataPetroleo
 from use_cases.model import train_and_forecast, evaluate_model, previsao
 
 def exibir():
@@ -16,7 +15,14 @@ def exibir():
     # Treinar o modelo e obter previsões
     df_brent_forecast_25 = train_and_forecast()
     mae, rmse, wmape = evaluate_model(df_brent_forecast_25)
-    st.write(f"**WMAPE:** {wmape:.4%}")
+    st.markdown(f"""
+    **Modelo treinado com dados de 2022 a 2025**
+    **Métricas de Avaliação:**
+
+    - **WMAPE:** {wmape:.4%} — métrica estática de erro percentual médio absoluto utilizando os modelos de treinamento e teste.
+    - O erro WMAPE é uma métrica que expressa o erro percentual médio absoluto entre as previsões e os valores reais. Quanto menor o WMAPE, melhor o desempenho do modelo.
+    """)
+
     st.write("Escolha o período para previsão:")
     periods = st.selectbox(
         "Selecione o número de dias para previsão:",

@@ -5,7 +5,7 @@ from streamlit_option_menu import option_menu
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from presentations.custom_pages import ml, storytelling, structure
+from presentations.custom_pages import ml, storytelling, structure,dashboard,dados
 
 st.set_page_config(
     page_title="Análise do Preço do Petróleo Brent",
@@ -26,18 +26,32 @@ st.set_page_config(
 with st.sidebar:
     escolha = option_menu(
         "Menu",
-        ["Home", "Storytelling e download dos dados", "Machine Learning", "Estrutura do Projeto"],
-        icons=['house', 'bar-chart', 'gear', 'book'],
+        ["Home", 
+         "Entenda o Preço do Petróleo", 
+         "Dashboard",
+         "Machine Learning", 
+         "Dados",
+         "Estrutura do Projeto"],
+        icons=['house', 
+               'bar-chart', 
+               'graph-up-arrow',
+               'file-earmark-text',
+               'gear', 
+               'book'],
         menu_icon="cast",
         default_index=0
     )
 
-if escolha == "Storytelling e download dos dados":
+if escolha == "Entenda o Preço do Petróleo":
     storytelling.exibir()
+elif escolha == "Dashboard":
+    dashboard.exibir()
 elif escolha == "Machine Learning":
     ml.exibir()
 elif escolha == "Estrutura do Projeto":
     structure.exibir()
+elif escolha == "Dados":
+    dados.exibir()
 elif escolha == "Home":
     st.title("Análise do Preço do Petróleo Brent")
     st.markdown("""
@@ -46,13 +60,6 @@ elif escolha == "Home":
 
     A aplicação permite **visualizar os dados**, **gerar gráficos temporais**, **realizar previsões com Machine Learning** e **baixar as informações em formato CSV**.
     """)
-
-    #Link powerbi:
-    st.markdown("""
-            <iframe title="Vendas v02" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNjgwYWVmNzQtMmMxYy00ZDE0LWI1OGEtNzI2NGZhYTEyYjA3IiwidCI6IjljOGEzMjFhLTcyNzktNDE5NS1hZjNkLTRjYmViMzY3YjA5ZSJ9" frameborder="0" allowFullScreen="true"></iframe>
-            """,
-    unsafe_allow_html=True
-    )
 
 
     st.markdown("Repositório do projeto: [GitHub - Leandrolsc/PosTech_DataAnalytics_Fase4](https://github.com/Leandrolsc/PosTech_DataAnalytics_Fase4)")
