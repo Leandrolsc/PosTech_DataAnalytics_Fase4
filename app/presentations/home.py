@@ -47,6 +47,14 @@ elif escolha == "Home":
     A aplicação permite **visualizar os dados**, **gerar gráficos temporais**, **realizar previsões com Machine Learning** e **baixar as informações em formato CSV**.
     """)
 
+    #Link powerbi:
+    st.markdown("""
+            <iframe title="Vendas v02" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNjgwYWVmNzQtMmMxYy00ZDE0LWI1OGEtNzI2NGZhYTEyYjA3IiwidCI6IjljOGEzMjFhLTcyNzktNDE5NS1hZjNkLTRjYmViMzY3YjA5ZSJ9" frameborder="0" allowFullScreen="true"></iframe>
+            """,
+    unsafe_allow_html=True
+    )
+
+
     st.markdown("Repositório do projeto: [GitHub - Leandrolsc/PosTech_DataAnalytics_Fase4](https://github.com/Leandrolsc/PosTech_DataAnalytics_Fase4)")
 
 st.markdown("---")
