@@ -9,7 +9,7 @@ def exibir():
     """)
     
     st.markdown("""
-            <iframe title="Vendas v02" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNjgwYWVmNzQtMmMxYy00ZDE0LWI1OGEtNzI2NGZhYTEyYjA3IiwidCI6IjljOGEzMjFhLTcyNzktNDE5NS1hZjNkLTRjYmViMzY3YjA5ZSJ9" frameborder="0" allowFullScreen="true"></iframe>
+            <iframe title="Brent_V01" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiM2Y1OGZiMDMtZGNkNS00OGI3LWJhY2YtNmE2ZjQ0YzIwNzdkIiwidCI6IjljOGEzMjFhLTcyNzktNDE5NS1hZjNkLTRjYmViMzY3YjA5ZSJ9" frameborder="0" allowFullScreen="true"></iframe>
             """,
     unsafe_allow_html=True
     )
